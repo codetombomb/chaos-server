@@ -2,61 +2,56 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 
+require('dotenv').config();
+
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+);
+
 app.use(cors({
     origin: 'http://localhost:3000'
 }));
 
+app.use(express.json());
+
 const port = process.env.PORT || 3001;
 
-app.get('/top-five', (req, res) => {
-    console.log("Received request for top five scores.")
-    const games = [
-        {
-            username: "Tom",
-            score: 10,
-            time: "02:15",
-            tpCollected: 8,
-            sanitizerCollected: 5
-        },
-        {
+app.get('/top-five', async (req, res) => {
+    console.log("Fetching top five from DB...");
 
-            username: "Mario",
-            score: 11,
-            time: "01:48",
-            tpCollected: 6,
-            sanitizerCollected: 4
-        },
-        {
+    const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .order('score', { ascending: false })
+        .limit(5);
 
-            username: "Mario",
-            score: 12,
-            time: "01:48",
-            tpCollected: 6,
-            sanitizerCollected: 4
-        },
-        {
+    if (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Failed to fetch scores' });
+    }
 
-            username: "Mario",
-            score: 13,
-            time: "01:48",
-            tpCollected: 6,
-            sanitizerCollected: 4
-        },
-        {
-
-            username: "Mario",
-            score: 14,
-            time: "01:48",
-            tpCollected: 6,
-            sanitizerCollected: 4
-        }
-    ]
-    res.send(games)
+    res.json(data);
 })
 
-app.post('/games', (req, res) => {
-    console.log("Received request to submit a new game score.")
-})
+app.post('/games', async (req, res) => {
+    const { username, score, time, tp_collected, sanitizer_collected } = req.body;
+
+    const { data, error } = await supabase
+        .from('games')
+        .insert([
+            { username, score, time, tp_collected, sanitizer_collected }
+        ]);
+
+    if (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Failed to submit game score' });
+    }
+
+    res.json(data);
+});
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
