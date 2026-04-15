@@ -1,0 +1,24 @@
+{
+  "name": "chaos-server",
+  "version": "1.0.0",
+  "description": "Lightweight Express server for managing game leaderboard scores.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codetombomb/chaos-server.git"
+  },
+  "author": "Tom Tobar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codetombomb/chaos-server/issues"
+  },
+  "homepage": "https://github.com/codetombomb/chaos-server#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
